@@ -57,7 +57,8 @@
 
   /* 상단 바 + 메뉴 */
   .topbar{flex:none;display:flex;align-items:center;gap:20px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));height:60px;background:var(--panel);border-bottom:1px solid var(--line)}
-  .logo{font-weight:700;font-size:17px;letter-spacing:-.02em;white-space:nowrap}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;letter-spacing:-.02em;white-space:nowrap}
+  .logo img{display:block;width:auto;height:22px;flex:none}
   .tabs{display:flex;gap:4px;height:100%}
   .tab{border:0;background:none;padding:0 15px;font-size:16px;font-weight:500;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
   .tab:hover{color:var(--ink)}
@@ -226,15 +227,22 @@
     .export .seg button,.seg button{font-size:14px}
   }
   @media (max-width:520px){
-    .logo{display:none}
-    .tab{padding:0 10px}
+    .topbar{gap:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+    .logo span{display:none}
+    .logo img{height:20px}
+    .tab{padding:0 8px;font-size:14px}
     .head .btn{flex:1}
+  }
+  @media (max-width:380px){
+    .topbar{gap:8px;padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+    .logo img{height:18px}
+    .tab{padding:0 4px;font-size:13px}
   }
 </style>
 </head>
 <body>
 <header class="topbar">
-  <div class="logo">Banner Editor</div>
+  <div class="logo"><img src="assets/kbsmedia-logo.png" alt="KBS미디어"><span>Banner Editor</span></div>
   <nav class="tabs" aria-label="메뉴">
     <button class="tab" data-menu="make">배너 제작</button>
     <button class="tab" data-menu="templates">템플릿 관리</button>
