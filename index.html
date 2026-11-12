@@ -1,0 +1,1445 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>배너 편집기</title>
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<!-- 저장소(Supabase) 설정: Project URL과 anon(공개) 키. Service Role 키는 넣지 마세요 -->
+<script src="config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&family=Noto+Serif+KR:wght@200..900&display=swap" rel="stylesheet">
+<style id="font-faces">
+  /* 글꼴 파일 (게시용 파일을 만들 때 build.ps1이 파일 안으로 넣음). Noto Sans KR은 Google Fonts */
+  @font-face{font-family:'SUIT Variable';font-weight:100 900;font-display:swap;src:url(fonts/SUIT-Variable.woff2) format('woff2')}
+  @font-face{font-family:'GmarketSans';font-weight:300;font-display:swap;src:url(fonts/GmarketSansLight.woff) format('woff')}
+  @font-face{font-family:'GmarketSans';font-weight:500;font-display:swap;src:url(fonts/GmarketSansMedium.woff) format('woff')}
+  @font-face{font-family:'GmarketSans';font-weight:700;font-display:swap;src:url(fonts/GmarketSansBold.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:100;font-display:swap;src:url(fonts/S-CoreDream-1Thin.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:200;font-display:swap;src:url(fonts/S-CoreDream-2ExtraLight.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:300;font-display:swap;src:url(fonts/S-CoreDream-3Light.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:400;font-display:swap;src:url(fonts/S-CoreDream-4Regular.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:500;font-display:swap;src:url(fonts/S-CoreDream-5Medium.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:600;font-display:swap;src:url(fonts/S-CoreDream-6Bold.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:700;font-display:swap;src:url(fonts/S-CoreDream-7ExtraBold.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:800;font-display:swap;src:url(fonts/S-CoreDream-8Heavy.woff) format('woff')}
+  @font-face{font-family:'S-Core Dream';font-weight:900;font-display:swap;src:url(fonts/S-CoreDream-9Black.woff) format('woff')}
+  /* KoPub 바탕 · 마루부리: 파일이 커서 앱 안에 넣지 않고 webfonts/ 파일로 함께 게시 */
+  @font-face{font-family:'KoPub Batang';font-weight:300;font-display:swap;src:url(webfonts/kopub-batang-300.woff2) format('woff2')}
+  @font-face{font-family:'KoPub Batang';font-weight:400;font-display:swap;src:url(webfonts/kopub-batang-400.woff2) format('woff2')}
+  @font-face{font-family:'KoPub Batang';font-weight:700;font-display:swap;src:url(webfonts/kopub-batang-700.woff2) format('woff2')}
+  @font-face{font-family:'MaruBuri';font-weight:200;font-display:swap;src:url(webfonts/MaruBuri-ExtraLight.woff2) format('woff2')}
+  @font-face{font-family:'MaruBuri';font-weight:300;font-display:swap;src:url(webfonts/MaruBuri-Light.woff2) format('woff2')}
+  @font-face{font-family:'MaruBuri';font-weight:400;font-display:swap;src:url(webfonts/MaruBuri-Regular.woff2) format('woff2')}
+  @font-face{font-family:'MaruBuri';font-weight:600;font-display:swap;src:url(webfonts/MaruBuri-SemiBold.woff2) format('woff2')}
+  @font-face{font-family:'MaruBuri';font-weight:700;font-display:swap;src:url(webfonts/MaruBuri-Bold.woff2) format('woff2')}
+</style>
+<style>
+  /* 메뉴 두 개(배너 제작 · 템플릿 관리) + 화면마다 '입력칸 | 미리보기' 두 칸 */
+  :root{
+    --bg:#F3F4F7; --panel:#FFFFFF; --ink:#17181C; --muted:#6B7280; --line:#E4E6EB;
+    --brand:#3B5BFF; --brand-hover:#2E4DF0; --brand-ink:#FFFFFF; --brand-soft:#EBEFFF;
+    --field:#FBFBFC; --hover:#F7F8FA; --check-a:#E9EBEF; --check-b:#FFFFFF;
+    --danger:#D92D20; --danger-soft:#FDECEC; --toast:#17181C; --toast-ink:#FFFFFF;
+    --shadow:0 10px 40px rgba(20,23,41,.14);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#121318; --panel:#1B1D24; --ink:#ECEDF2; --muted:#9AA0AE; --line:#2C2F3A;
+      --brand:#6F86FF; --brand-hover:#8496FF; --brand-ink:#0D1030; --brand-soft:#252B4D;
+      --field:#22252E; --hover:#252833; --check-a:#2A2D36; --check-b:#1F2128;
+      --danger:#FF7A6E; --danger-soft:#3A2022; --toast:#ECEDF2; --toast-ink:#17181C;
+      --shadow:0 10px 40px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.4);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121318; --panel:#1B1D24; --ink:#ECEDF2; --muted:#9AA0AE; --line:#2C2F3A;
+    --brand:#6F86FF; --brand-hover:#8496FF; --brand-ink:#0D1030; --brand-soft:#252B4D;
+    --field:#22252E; --hover:#252833; --check-a:#2A2D36; --check-b:#1F2128;
+    --danger:#FF7A6E; --danger-soft:#3A2022; --toast:#ECEDF2; --toast-ink:#17181C;
+    --shadow:0 10px 40px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.4);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+  button,input,textarea,select{font:inherit;color:inherit}
+  button{cursor:pointer}
+  :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  h1{font-size:36px;font-weight:800;margin:0;letter-spacing:-.01em;text-wrap:balance}
+  .spacer{flex:1}
+
+  /* 상단 바 + 메뉴 */
+  .topbar{flex:none;display:flex;align-items:center;gap:20px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));height:60px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .logo{font-weight:700;font-size:18px;letter-spacing:-.02em;white-space:nowrap}
+  .tabs{display:flex;gap:4px;height:100%}
+  .tab{border:0;background:none;padding:0 15px;font-size:16px;font-weight:500;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
+  .tab:hover{color:var(--ink)}
+  .tab[aria-current="page"]{color:var(--brand);font-weight:700;border-bottom-color:var(--brand)}
+
+  /* 버튼: small / 기본 / big(Large) × primary / danger / dashed */
+  .btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:15px 16px;font-size:18px;font-weight:600;line-height:1.2;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .08s,background .15s;white-space:nowrap}
+  .btn:hover{background:var(--hover)}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+  .btn.primary:hover{background:var(--brand-hover)}
+  .btn.small{padding:11px 12px;font-size:16px;border-radius:8px}
+  .btn.danger{color:var(--danger)}
+  .btn.danger:hover,.btn.danger.armed{background:var(--danger-soft)}
+  .btn.big{padding:20px 26px;font-size:20px}
+  .btn.dashed{border-style:dashed;color:var(--brand)}
+  .back{border:0;background:none;color:var(--muted);font-size:22px;font-weight:600;padding:0}
+  .back:hover{color:var(--ink)}
+
+  /* 화면: 뒤로가기 · (제목 + 내용) */
+  #view{flex:1;min-height:0;overflow-y:auto}
+  .page{max-width:1232px;margin:0 auto;padding-block:64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:40px}
+  .page.sub{gap:36px}
+  .body{display:flex;flex-direction:column;gap:26px}
+  .head{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;padding-left:6px}
+  .head p{margin:8px 0 0;color:var(--muted);font-size:20px}
+  .head p.tpl{font-weight:600}
+  .head p.tpl b{color:var(--ink);font-weight:600;margin-left:2px}
+  .head .btn.big{min-width:160px}
+
+  /* 템플릿 카드 */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,320px));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;text-align:left;padding:0}
+  button.card{transition:border-color .15s,box-shadow .15s}
+  button.card:hover{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+  .card canvas{display:block;width:100%;aspect-ratio:16/9;background:repeating-conic-gradient(var(--check-a) 0 25%,var(--check-b) 0 50%) 0 0/12px 12px}
+  .card-body{padding:20px 20px 22px;display:flex;flex-direction:column;gap:6px;width:100%}
+  .card-name{font-size:20px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:2px}
+  .card-meta{font-size:16px;color:var(--muted);font-variant-numeric:tabular-nums;padding-left:2px}
+  .card-acts{display:flex;gap:8px;padding:0 20px 20px}
+  .card-acts .btn{flex:1}
+  .empty{background:var(--panel);border:1.5px dashed var(--line);border-radius:14px;padding:40px 20px;text-align:center;color:var(--muted);font-size:18px;display:flex;flex-direction:column;align-items:center;gap:14px;line-height:1.6}
+  /* 점선 박스 (템플릿 없음 · 배경 삽입): 마우스를 올리면 파란 점선 + 연한 파란 배경 */
+  .drop-box{display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--line);border-radius:12px;background:var(--field);cursor:pointer;transition:border-color .15s,background .15s}
+  .drop-box:hover,.drop-box:focus-within,.img-box.dragging{border-color:var(--brand);background:var(--brand-soft)}
+  .drop-box.empty-list{min-height:298px;padding:40px 20px;border-radius:14px}
+  .drop-box.empty-list .btn.big{padding:22px 34px;font-size:22px;border-radius:12px}
+
+  /* 입력칸 | 미리보기 */
+  .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,640px);gap:24px;align-items:start}
+  .split.make{gap:20px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:30px 24px;display:flex;flex-direction:column;gap:28px}
+  #tpl-form{padding:38px 30px;gap:32px}
+  .split.make .panel{align-self:stretch}
+  .preview{position:sticky;top:20px;display:flex;flex-direction:column;align-items:center;gap:14px;min-width:0}
+  .preview.guide{padding-top:26px}
+  .preview canvas{display:block;width:100%;max-width:640px;aspect-ratio:16/9;box-shadow:var(--shadow);background:repeating-conic-gradient(var(--check-a) 0 25%,var(--check-b) 0 50%) 0 0/16px 16px}
+  .split.make .preview canvas{box-shadow:0 10px 20px rgba(20,23,41,.14)}
+  .preview .cap{margin:0;max-width:460px;font-size:15px;line-height:1.2;color:var(--muted);text-align:center}
+
+  /* 입력 항목 */
+  .sec{display:flex;flex-direction:column;gap:14px}
+  .sec + .sec{border-top:1px solid var(--line);padding-top:32px}
+  .sec-head{display:flex;align-items:center;gap:14px}
+  .sec-head h2{margin:0;font-size:24px;font-weight:800}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 12px}
+  .ctl{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .ctl.full{grid-column:1 / -1}
+  .toggle-row{flex-direction:row;align-items:center;justify-content:space-between;min-height:36px;margin-top:4px}
+  .toggle-row > label{font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+  .toggle-row.on > label{color:var(--brand)}
+  .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .text-edit .grid .stroke-ctl{margin-top:-8px}
+  .switch{appearance:none;-webkit-appearance:none;width:52px;height:30px;border-radius:15px;background:var(--line);position:relative;cursor:pointer;transition:background .15s;margin:0;flex:none}
+  .switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .switch:checked{background:var(--brand)}
+  .switch:checked::after{transform:translateX(22px)}
+  .ctl > label,.ctl > .lbl{font-size:15px;font-weight:600;color:var(--muted);padding-left:2px}
+  .inp{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:10px;background:var(--field);transition:border .15s}
+  .inp:focus-within{border-color:var(--brand)}
+  .inp.off{opacity:.45}
+  .inp.off input{cursor:not-allowed}
+  .inp input,.inp select{flex:1;min-width:0;border:0;background:none;padding:12px 14px;outline:none;font-size:18px;font-weight:500;font-variant-numeric:tabular-nums}
+  .inp select{padding-right:34px;appearance:none;-webkit-appearance:none;cursor:pointer;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath d='M0 0h8L4 5z' fill='%236B7280'/%3E%3C/svg%3E") no-repeat right 14px center/8px 5px}
+  .inp .unit{padding-right:14px;color:var(--muted);font-size:16px}
+  textarea.inp{display:block;width:100%;padding:12px 14px;resize:vertical;min-height:72px;outline:none;line-height:1.4;font-size:18px;font-weight:500}
+  .big-field{gap:6px}
+  .big-field textarea.inp{font-size:18px;padding:12px;min-height:50px;line-height:1.2;resize:none;field-sizing:content}
+  .big-field textarea.inp::placeholder{color:var(--muted)}
+  .big-field > label{font-size:20px;color:var(--ink);font-weight:700;padding-left:4px}
+  .seg{display:flex;background:var(--hover);border:1px solid var(--line);border-radius:10px;padding:6px}
+  .seg button{flex:1;border:0;background:none;border-radius:8px;padding:12px 4px;font-size:18px;font-weight:600;color:var(--muted)}
+  .seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .color{display:flex;align-items:center;gap:8px}
+  .color input[type=color]{width:36px;height:36px;border:0;padding:0;border-radius:50%;background:none;cursor:pointer;flex:none}
+  .color input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  .color input[type=color]::-webkit-color-swatch{border:none;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+  .color input[type=color]::-moz-color-swatch{border:none;border-radius:50%}
+  .color .inp{flex:1;min-width:0}
+  .color .inp input{width:100%;text-transform:uppercase}
+  .range{display:flex;align-items:center;gap:8px}
+  .range input[type=range]{flex:1;min-width:0;accent-color:var(--brand)}
+  .range .inp{width:84px;flex:none}
+  .bg-body{display:flex;flex-direction:column;gap:32px}
+  .bg-body .grid{gap:16px}
+  .img-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1.5px dashed var(--line);border-radius:12px;padding:12px;background:var(--field)}
+  .img-box.empty-img{justify-content:center;padding:42px 12px}
+  .img-box.empty-img .btn{padding:18px 28px;font-size:18px}
+  .img-box img{width:120px;aspect-ratio:16/9;border-radius:6px;object-fit:cover;flex:none}
+  .img-box .grow{flex:1;min-width:140px;font-size:15px;line-height:1.5;color:var(--muted)}
+  .img-box .acts{display:flex;gap:6px}
+  .note{margin:0;font-size:16px;line-height:1.6;color:var(--muted)}
+  /* 템플릿 텍스트 목록 */
+  .text-item{display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--field);text-align:left;transition:border-color .15s,background .15s}
+  .text-item:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .t-badge{width:44px;height:44px;border-radius:8px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:800;font-size:20px;flex:none}
+  .t-info{flex:1;min-width:0;display:flex;flex-direction:column}
+  .t-info b{font-size:20px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .text-edit{background:var(--panel);border:1.5px solid var(--brand);border-radius:12px;padding:24px 20px;display:flex;flex-direction:column;gap:48px}
+  .text-acts{display:flex;gap:8px}
+  .text-acts .btn{flex:1;padding:20px 26px;font-size:20px}
+  .add-text{flex:none;border:0;background:none;padding:6px 2px;font-size:18px;font-weight:500;color:var(--muted)}
+  .add-text:hover{color:var(--brand)}
+  .link{border:0;background:none;color:var(--muted);font-size:14px;text-decoration:underline;padding:2px}
+
+  /* 이미지 추출 */
+  .export{width:100%;max-width:640px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .export .seg button{font-size:18px;padding:12px 4px;font-variant-numeric:tabular-nums}
+  .export-btns{display:flex;gap:8px}
+  .export-btns .btn{flex:1;height:64px}
+  /* 배너 등록 · 공유 */
+  .share-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:18px}
+  .share-id{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .share-btns{display:flex;gap:8px}
+  .share-btns .btn{flex:1}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .share-url{display:flex;gap:8px}
+  .save-status{margin:0;font-size:14px;color:var(--muted)}
+  .save-status::before{content:"● ";color:#1a9e5c}
+  .save-status[data-state="pending"]::before,.save-status[data-state="saving"]::before{color:#e0a100}
+  .save-status[data-state="error"]{color:var(--danger)}
+  .save-status[data-state="error"]::before{color:var(--danger)}
+  .update-note{color:var(--ink)}
+  .inp-plain{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:10px;background:var(--field);padding:12px 14px;font-size:15px;color:var(--ink)}
+
+  .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--toast);color:var(--toast-ink);padding:12px 18px;border-radius:12px;font-weight:700;opacity:0;pointer-events:none;transition:all .25s;z-index:10;max-width:calc(100vw - 32px)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion: reduce){ .toast,.btn,button.card{transition:none} }
+
+  @media (max-width:900px){
+    .split{grid-template-columns:1fr}
+    .preview{position:static;order:-1}
+    .preview.guide{padding-top:0}
+  }
+  @media (max-width:640px){
+    .tab{width:auto}
+    h1{font-size:28px}
+    .head p,.back{font-size:17px}
+    .page{padding-block:32px;gap:28px}
+    #tpl-form{padding:26px 18px}
+    .export .seg button,.seg button{font-size:14px}
+  }
+  @media (max-width:520px){
+    .logo{display:none}
+    .tab{padding:0 10px}
+    .head .btn{flex:1}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">Banner Editor</div>
+  <nav class="tabs" aria-label="메뉴">
+    <button class="tab" data-menu="make">배너 제작</button>
+    <button class="tab" data-menu="templates">템플릿 관리</button>
+  </nav>
+  <div class="spacer"></div>
+  <button class="btn small" id="admin-logout" hidden>관리자 로그아웃</button>
+</header>
+<main id="view"></main>
+<input type="file" id="bg-file" accept="image/*" hidden>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =====================================================================
+   템플릿 기반 배너 제작
+   - 템플릿 관리(관리자): 디자이너가 준 배경 이미지·텍스트 위치·스타일을 정해진 입력칸으로 등록
+   - 배너 제작(일반 사용자): 템플릿을 고르고 문구만 바꿔서 PNG로 추출
+
+   화면(view): make-pick → make-edit,  manage-list → manage-form
+   메뉴는 주소의 #make / #templates 로 바뀜 (새로고침해도 같은 메뉴)
+
+   템플릿 = { id, name, updatedAt,
+              background: { image, fill, color, color2, angle },
+              texts: [ { id, name, sample, x, y, w, fontFamily, fontSize, fontWeight, color, align, lineHeightPx, letterSpacingPct } ] }
+   저장은 TemplateStore 한 곳에서만 함 → 여러 사람이 같이 쓰는 저장소로 바꿀 때 여기만 고치면 됨
+   ===================================================================== */
+const DOC_W = 640, DOC_H = 360;
+const FONT = '"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+/* 글꼴: 고를 수 있는 글꼴과 글꼴마다 쓸 수 있는 굵기 */
+const ALL_WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+const WEIGHT_NAMES = { 100: 'Thin', 200: 'ExtraLight', 300: 'Light', 400: 'Regular', 500: 'Medium', 600: 'SemiBold', 700: 'Bold', 800: 'ExtraBold', 900: 'Black' };
+const FONTS = {
+  pretendard: { label: 'Pretendard', css: '"Pretendard Variable"', weights: ALL_WEIGHTS },
+  noto:       { label: 'Noto Sans KR', css: '"Noto Sans KR"', weights: ALL_WEIGHTS },
+  suit:       { label: 'SUIT', css: '"SUIT Variable"', weights: ALL_WEIGHTS },
+  gmarket:    { label: 'Gmarket Sans', css: '"GmarketSans"', weights: [300, 500, 700] },
+  score:      { label: 'S-Core Dream', css: '"S-Core Dream"', weights: ALL_WEIGHTS,
+                names: { 600: 'Bold', 700: 'ExtraBold', 800: 'Heavy' } }, // S-Core Dream은 굵기 이름이 다름
+  notoSerif:  { label: 'Noto Serif KR', css: '"Noto Serif KR"', weights: [200, 300, 400, 500, 600, 700, 800, 900] },
+  kopub:      { label: 'KoPub 바탕', css: '"KoPub Batang"', weights: [300, 400, 700], names: { 400: 'Medium' } },
+  maruburi:   { label: '마루부리', css: '"MaruBuri"', weights: [200, 300, 400, 600, 700] },
+};
+const fontOf = t => FONTS[t.fontFamily] || FONTS.pretendard;
+const nearestWeight = (fam, w) => (FONTS[fam] || FONTS.pretendard).weights.reduce((a, b) => Math.abs(b - w) < Math.abs(a - w) ? b : a);
+const fontSpec = (t, size = t.fontSize) => `${nearestWeight(t.fontFamily, t.fontWeight)} ${size}px ${fontOf(t).css},${FONT}`;
+// 글꼴 파일이 아직 안 왔으면 불러오고, 오면 다시 그림
+function ensureFont(t, text) {
+  if (!document.fonts) return;
+  const spec = fontSpec(t, 20), s = String(text || '가');
+  try { if (!document.fonts.check(spec, s)) document.fonts.load(spec, s).then(repaint).catch(() => {}); } catch (e) {}
+}
+const SCALES = [1, 2, 3];
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const $ = s => document.querySelector(s);
+const uid = () => 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+/* ================= 텍스트 항목 =================
+   템플릿마다 텍스트를 원하는 만큼 추가 (이름은 관리자가 정함: 예) 타이틀, 날짜, 장소)
+   목록 순서대로 그림 */
+const TEXT_DEFAULT = { name: '', sample: '문구를 입력해주세요', x: 48, y: 48, w: DOC_W - 96, fontFamily: 'pretendard', fontSize: 24, fontWeight: 700,
+                       color: '#ffffff', align: 'left', strokeOn: false, strokeColor: null, strokeWidth: 1 };
+// 줄 간격은 px, 자간은 글자 크기의 % (Figma와 같은 방식)
+// 예전 값(줄 간격 = 배수, 자간 = px)은 보이는 모양 그대로 새 단위로 바꿈
+// 예시 문구는 모든 텍스트가 같은 문구를 씀 (예전에 저장한 다른 예시 문구도 이 문구로 바뀜)
+function newText(over = {}) {
+  const t = { ...TEXT_DEFAULT, id: uid(), ...over, sample: TEXT_DEFAULT.sample };
+  if (t.lineHeightPx == null) t.lineHeightPx = Math.round(t.fontSize * (over.lineHeight ?? 1.3));
+  if (t.letterSpacingPct == null) t.letterSpacingPct = Math.round((over.letterSpacing || 0) / t.fontSize * 1000) / 10;
+  delete t.lineHeight; delete t.letterSpacing;
+  return t;
+}
+const BG_DEFAULT = { image: null, fill: 'gradient', color: '#1c2566', color2: '#3b5bff', angle: 120 };
+
+function newTemplate(over = {}) {
+  const { fields, ...rest } = over; // fields: 이전 구조(서브타이틀·타이틀·상세정보 고정)의 흔적 → 버림
+  const texts = Array.isArray(over.texts) ? over.texts.map(t => newText(t)) : [];
+  return { id: uid(), name: '', updatedAt: Date.now(), ...rest, background: { ...BG_DEFAULT, ...(over.background || {}) }, texts };
+}
+const clone = t => JSON.parse(JSON.stringify(t));
+const sampleTexts = t => Object.fromEntries(t.texts.map(x => [x.id, x.sample]));
+
+/* ================= 템플릿 저장소 =================
+   지금은 이 브라우저에 저장. 모든 함수가 Promise를 돌려주므로
+   공유 저장소(서버)로 바꿔도 화면 코드는 그대로 둘 수 있음 */
+const TemplateStore = {
+  KEY: 'banner-templates-v2',
+  _cache: null,      // 서버에서 마지막으로 받은 목록
+  lastError: null,   // 서버에서 목록을 못 받았을 때 오류 내용
+  // Supabase 설정이 있으면 서버(templates 테이블)에 저장 → 모든 사람이 같은 템플릿을 봄
+  // 설정이 없으면 예전처럼 이 브라우저에만 저장
+  cloud() { return BannerCloud.ready(); },
+  _all() {
+    try { const a = JSON.parse(localStorage.getItem(this.KEY) || 'null'); return Array.isArray(a) ? a.map(t => newTemplate(t)) : null; }
+    catch (e) { return null; }
+  },
+  _write(list) {
+    try { localStorage.setItem(this.KEY, JSON.stringify(list)); return true; }
+    catch (e) { toast('저장 공간이 부족해요. 배경 이미지가 큰 템플릿을 정리해 주세요'); return false; }
+  },
+  _mem: null, // 브라우저 저장을 못 쓰는 환경(시크릿 창 등)에서는 이번 창에서만 기억
+  _localList() { return (this._all() || this._mem || []).sort((a, b) => b.updatedAt - a.updatedAt); },
+  // 이 브라우저에 예전 방식으로 저장돼 있던 템플릿 (서버로 옮기기용)
+  localTemplates() { return this._all() || []; },
+  async list() {
+    if (!this.cloud()) return this._localList();
+    try {
+      const rows = await BannerCloud.req('/rest/v1/templates?select=id,data,updated_at&order=updated_at.desc');
+      this._cache = (rows || []).map(r => newTemplate({ ...r.data, id: r.id, updatedAt: Date.parse(r.updated_at) || Date.now() }));
+      this.lastError = null;
+    } catch (e) {
+      this.lastError = e.message || '연결 오류';
+      if (!this._cache) this._cache = [];
+    }
+    return this._cache;
+  },
+  async get(id) { return (await this.list()).find(t => t.id === id) || null; },
+  async save(t) {
+    if (!this.cloud()) {
+      const list = this._localList(), i = list.findIndex(x => x.id === t.id);
+      const item = { ...clone(t), updatedAt: Date.now() };
+      if (i >= 0) list[i] = item; else list.push(item);
+      this._mem = list;
+      return this._write(list) ? item : null;
+    }
+    const key = AdminAuth.key();
+    if (!key) { toast('관리자 로그인이 필요해요'); return null; }
+    try {
+      const item = clone(t);
+      delete item.updatedAt;
+      // 배경 이미지는 Storage에 올리고 주소만 저장 (DB 용량 · 불러오는 속도 절약)
+      item.background.image = await BannerCloud.uploadImage('templates/' + t.id, item.background.image);
+      const ok = await BannerCloud.rpc('save_template', { p_key: key, p_id: t.id, p_data: item });
+      if (ok !== true) { AdminAuth.logout(); toast('관리자 비밀번호가 맞지 않아요. 다시 로그인해 주세요'); return null; }
+      this._cache = null;
+      return { ...item, updatedAt: Date.now() };
+    } catch (e) { toast(`서버에 저장하지 못했어요 (${e.message})`); return null; }
+  },
+  async remove(id) {
+    if (!this.cloud()) {
+      const list = this._localList().filter(t => t.id !== id);
+      this._mem = list;
+      return this._write(list);
+    }
+    const key = AdminAuth.key();
+    if (!key) { toast('관리자 로그인이 필요해요'); return false; }
+    try {
+      const ok = await BannerCloud.rpc('delete_template', { p_key: key, p_id: id });
+      if (ok !== true) { AdminAuth.logout(); toast('관리자 비밀번호가 맞지 않아요. 다시 로그인해 주세요'); return false; }
+      this._cache = null;
+      return true;
+    } catch (e) { toast(`서버에서 삭제하지 못했어요 (${e.message})`); return false; }
+  },
+  // (브라우저 저장 방식일 때만) 처음 열면 예시 템플릿을 넣고, 이전 버전에서 올린 배경 이미지도 템플릿으로 옮김
+  init() {
+    if (this.cloud()) return; // 서버 저장 방식이면 예시 템플릿을 만들지 않음 (관리자가 등록한 것만 보임)
+    const existing = this._all();
+    if (existing) {
+      // 한 번만: 이전 구조에서 자동으로 들어갔던 서브타이틀·타이틀·상세정보 텍스트를 지움
+      let done = false; try { done = !!localStorage.getItem('banner-templates-cleanup-v1'); } catch (e) {}
+      if (!done) {
+        const OLD = new Set(['서브타이틀', '타이틀', '상세정보']);
+        existing.forEach(t => { t.texts = t.texts.filter(x => !OLD.has(x.name)); });
+        if (this._write(existing)) { try { localStorage.setItem('banner-templates-cleanup-v1', '1'); } catch (e) {} }
+      }
+      return;
+    }
+    try { localStorage.setItem('banner-templates-cleanup-v1', '1'); } catch (e) {}
+    const now = Date.now();
+    const list = [
+      newTemplate({ name: '기본 블루 (예시)', updatedAt: now }),
+      newTemplate({ name: '다크 (예시)', updatedAt: now - 1, background: { fill: 'solid', color: '#17181c' } }),
+    ];
+    try {
+      const old = JSON.parse(localStorage.getItem('banner-editor-templates-v1') || '[]');
+      if (Array.isArray(old)) old.forEach((o, i) => o && typeof o.src === 'string' &&
+        list.push(newTemplate({ name: o.name || '가져온 템플릿', updatedAt: now - 2 - i, background: { image: o.src } })));
+    } catch (e) {}
+    this._mem = list;
+    this._write(list);
+  },
+};
+
+/* ================= 그리기 ================= */
+// 글자 줄바꿈: 띄어쓰기 단위로, 한 단어가 너무 길면 글자 단위로
+function wrap(ctx, text, maxW) {
+  const out = [];
+  for (const para of String(text).split('\n')) {
+    let line = '';
+    for (const word of para.split(' ')) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width <= maxW) { line = test; continue; }
+      if (line) out.push(line);
+      if (ctx.measureText(word).width <= maxW) { line = word; continue; }
+      let chunk = '';
+      for (const ch of word) {
+        if (chunk && ctx.measureText(chunk + ch).width > maxW) { out.push(chunk); chunk = ch; }
+        else chunk += ch;
+      }
+      line = chunk;
+    }
+    out.push(line);
+  }
+  return out;
+}
+
+const imgCache = new Map();
+function getImg(src) {
+  if (!src) return null;
+  let im = imgCache.get(src);
+  if (!im) {
+    im = new Image(); im.onload = repaint;
+    // 저장소(Supabase)에 올린 이미지: PNG/JPG로 내보낼 수 있게 CORS로 불러옴
+    if (!src.startsWith('data:') && !src.startsWith('blob:')) im.crossOrigin = 'anonymous';
+    im.src = src; imgCache.set(src, im);
+  }
+  return im.complete && im.naturalWidth ? im : null;
+}
+function imgReady(src) {
+  if (!src || getImg(src)) return Promise.resolve();
+  const im = imgCache.get(src);
+  return new Promise(ok => { im.addEventListener('load', ok, { once: true }); im.addEventListener('error', ok, { once: true }); });
+}
+
+function drawBackground(ctx, b) {
+  if (b.fill === 'gradient') {
+    // CSS와 같은 각도 기준: 0° = 아래→위, 90° = 왼쪽→오른쪽
+    const a = (b.angle || 0) * Math.PI / 180, vx = Math.sin(a), vy = -Math.cos(a);
+    const len = (Math.abs(DOC_W * vx) + Math.abs(DOC_H * vy)) / 2, cx = DOC_W / 2, cy = DOC_H / 2;
+    const g = ctx.createLinearGradient(cx - vx * len, cy - vy * len, cx + vx * len, cy + vy * len);
+    g.addColorStop(0, b.color); g.addColorStop(1, b.color2);
+    ctx.fillStyle = g;
+  } else ctx.fillStyle = b.color;
+  ctx.fillRect(0, 0, DOC_W, DOC_H);
+  const im = getImg(b.image); // 배경 이미지: 작업 영역을 꽉 채움 (넘치면 가운데 기준으로 잘림)
+  if (im) {
+    const iw = im.naturalWidth, ih = im.naturalHeight, s = Math.max(DOC_W / iw, DOC_H / ih);
+    ctx.drawImage(im, (DOC_W - iw * s) / 2, (DOC_H - ih * s) / 2, iw * s, ih * s);
+  }
+}
+function drawText(ctx, f, text) {
+  ctx.font = fontSpec(f); ensureFont(f, text);
+  ctx.letterSpacing = `${(f.letterSpacingPct || 0) / 100 * f.fontSize}px`; // 자간 %: 글자 크기 기준
+  // 글자 영역은 Hug × Hug: 너비 = 가장 긴 줄, 높이 = 줄 수 × 줄 간격
+  // 정렬은 640×360 대지 기준으로 영역을 옮김 (Y는 항상 위에서부터)
+  //   왼쪽: 대지 왼쪽에서 X만큼 / 가운데: 대지 가운데 (X 안 씀) / 오른쪽: 대지 오른쪽에서 X만큼
+  // 대지 끝을 넘을 만큼 길 때만 자동 줄바꿈
+  const room = f.align === 'center' ? DOC_W : DOC_W - f.x;
+  const lines = wrap(ctx, text, Math.max(10, room)), lh = f.lineHeightPx || f.fontSize * 1.3;
+  const w = Math.max(1, Math.ceil(Math.max(...lines.map(ln => ctx.measureText(ln).width))));
+  const bx = f.align === 'center' ? (DOC_W - w) / 2 : f.align === 'right' ? DOC_W - f.x - w : f.x;
+  ctx.save();
+  ctx.fillStyle = f.color; // 불투명도 설정은 없음: 글자는 항상 100%
+  ctx.textAlign = f.align; ctx.textBaseline = 'middle'; // 여러 줄이면 영역 안에서도 같은 쪽으로 맞춤
+  const ax = f.align === 'center' ? bx + w / 2 : f.align === 'right' ? bx + w : bx;
+  // 선색: 글자 바깥쪽으로 선 굵기만큼 (선을 두 배 굵기로 먼저 그리고 그 위에 글자)
+  if (f.strokeOn && f.strokeWidth > 0) {
+    ctx.strokeStyle = f.strokeColor || f.color; ctx.lineWidth = f.strokeWidth * 2; ctx.lineJoin = "round"; ctx.miterLimit = 2;
+    lines.forEach((ln, i) => ctx.strokeText(ln, ax, f.y + i * lh + lh / 2));
+  }
+  lines.forEach((ln, i) => ctx.fillText(ln, ax, f.y + i * lh + lh / 2));
+  ctx.restore();
+  ctx.letterSpacing = '0px';
+  return { x: bx, y: f.y, w, h: Math.max(1, lines.length) * lh };
+}
+/* 배너 한 장 그리기 (ctx는 640×360 좌표). 미리보기·목록 썸네일·이미지 추출이 모두 이 함수를 씀
+   texts: { 텍스트 id: 사용자가 입력한 문구 } (비어 있으면 예시 문구) */
+function renderBanner(ctx, tpl, texts) {
+  drawBackground(ctx, tpl.background);
+  const boxes = [];
+  for (const t of tpl.texts) boxes.push({ name: t.name, color: t.color, ...drawText(ctx, t, texts[t.id] || t.sample) });
+  return boxes;
+}
+// 템플릿 관리 미리보기 전용: 글자 영역을 점선으로 (추출 이미지에는 안 들어감)
+function drawGuides(ctx, boxes) {
+  ctx.save();
+  ctx.font = `500 12px ${FONT}`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+  const TAG_H = 24, GAP = 4;
+  for (const b of boxes) {
+    ctx.setLineDash([4, 3]); ctx.lineWidth = 1;
+    ctx.strokeStyle = b.color || '#ffffff'; // 점선은 글자색과 같은 색
+    ctx.strokeRect(b.x + .5, b.y + .5, b.w - 1, b.h - 1);
+    ctx.setLineDash([]);
+    // 이름표는 영역 바로 위 왼쪽 (위에 자리가 없으면 영역 안쪽 왼쪽 위)
+    const label = b.name || '이름 없음', tw = ctx.measureText(label).width + 20;
+    const ty = b.y - TAG_H - GAP >= 0 ? b.y - TAG_H - GAP : b.y + GAP;
+    ctx.fillStyle = 'rgba(17,18,22,.88)';
+    ctx.beginPath(); ctx.roundRect ? ctx.roundRect(b.x, ty, tw, TAG_H, 3) : ctx.rect(b.x, ty, tw, TAG_H); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.fillText(label, b.x + 10, ty + TAG_H / 2);
+  }
+  ctx.restore();
+}
+// 캔버스에 배너를 scale배 해상도로 그림
+function paint(canvas, tpl, texts, scale, guides = false) {
+  canvas.width = Math.round(DOC_W * scale); canvas.height = Math.round(DOC_H * scale);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  const boxes = renderBanner(ctx, tpl, texts);
+  if (guides) drawGuides(ctx, boxes);
+}
+
+/* 화면에 보이는 캔버스: 이미지·글꼴이 늦게 도착하거나 값이 바뀌면 다시 그림 */
+let live = [];
+function liveCanvas(draw) { live.push(draw); draw(); }
+let raf = 0;
+function repaint() { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => live.forEach(d => d())); }
+if (document.fonts) {
+  document.fonts.addEventListener('loadingdone', repaint);
+  document.fonts.load(`400 20px "Pretendard Variable"`, '가나다ABC').then(repaint).catch(() => {});
+}
+const SHARP = Math.min(2, Math.max(1, window.devicePixelRatio || 1)); // 화면 미리보기 해상도
+
+/* ================= 화면 이동 ================= */
+const state = {
+  view: 'make-pick',   // make-pick | make-edit | manage-list | manage-form
+  tplId: null,         // 배너 제작에서 고른 템플릿
+  texts: {},           // 템플릿별로 사용자가 입력한 문구 (이번 창에서만)
+  scale: 1,            // 추출 배율
+  draft: null,         // 템플릿 관리에서 등록·수정 중인 템플릿
+  draftIsNew: false,
+  textSteps: {},       // 새로 추가한 텍스트가 수정 창에서 몇 단계까지 나왔는지
+  shared: null,        // 공유 URL로 연 배너 { id, data, tpl, texts, editKey }
+};
+const view = $('#view');
+const VIEWS = { 'make-pick': renderMakePick, 'make-edit': renderMakeEdit, 'manage-list': renderManageList, 'manage-form': renderManageForm };
+const MENU_ROOT = { make: 'make-pick', templates: 'manage-list' };
+const menuOf = v => v.startsWith('make') ? 'make' : 'templates';
+
+async function go(v) {
+  AutoSave.flush(); LiveView.stop(); // 화면을 바꾸기 전에 저장 대기 중인 내용은 바로 저장, 자동 갱신은 멈춤
+  if (v !== 'make-edit') leaveShared(); // 공유 배너 화면을 벗어나면 공유 상태를 끝냄
+  state.view = v;
+  const menu = menuOf(v);
+  if (location.hash !== '#' + menu) { try { history.replaceState(null, '', '#' + menu); } catch (e) {} }
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.menu === menu ? 'page' : 'false'));
+  live = [];
+  await VIEWS[v]();
+  view.scrollTop = 0;
+}
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => go(MENU_ROOT[t.dataset.menu])));
+window.addEventListener('hashchange', () => {
+  const m = location.hash.slice(1);
+  if (MENU_ROOT[m] && menuOf(state.view) !== m) go(MENU_ROOT[m]);
+});
+
+function templateCard(t, { button = false, meta = '' } = {}) {
+  const el = document.createElement(button ? 'button' : 'article');
+  el.className = 'card';
+  el.innerHTML = `<canvas aria-hidden="true"></canvas><span class="card-body"><span class="card-name"></span>${meta ? `<span class="card-meta">${meta}</span>` : ''}</span>`;
+  el.querySelector('.card-name').textContent = t.name;
+  const c = el.querySelector('canvas');
+  liveCanvas(() => paint(c, t, sampleTexts(t), .5 * SHARP));
+  return el;
+}
+const fmtDate = ms => { const d = new Date(ms); return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} 수정`; };
+
+/* ================= B. 배너 제작 ================= */
+// 1) 템플릿 고르기
+async function renderMakePick() {
+
+  const list = await TemplateStore.list();
+  const cloud = TemplateStore.cloud();
+  view.innerHTML = `<div class="page">
+    <div class="head"><div><h1>템플릿 고르기</h1><p>만들 배너의 템플릿을 눌러 문구를 바꾸고 사용해 보세요.${cloud ? '<br>관리자가 등록·수정한 최신 템플릿이 표시돼요.' : ''}</p></div>
+      ${cloud ? '<span class="spacer"></span><button class="btn big" id="reload-list">목록 새로고침</button>' : ''}</div>
+    ${TemplateStore.lastError ? `<p class="note">서버에서 템플릿을 불러오지 못했어요 (${TemplateStore.lastError}). 잠시 후 [목록 새로고침]을 눌러 주세요.</p>` : ''}
+    <div class="cards" id="cards"></div></div>`;
+  $('#reload-list')?.addEventListener('click', () => go('make-pick'));
+  const cards = $('#cards');
+  if (!list.length) {
+    const admin = AdminAuth.isAdmin();
+    cards.outerHTML = `<div class="empty">아직 등록된 템플릿이 없어요.<br>${admin ? '템플릿 관리에서 먼저 등록해 주세요.<button class="btn primary" id="to-manage">템플릿 관리로 가기</button>' : '관리자가 템플릿을 등록하면 여기에 표시돼요.'}</div>`;
+    $('#to-manage')?.addEventListener('click', () => go('manage-list'));
+    return;
+  }
+  list.forEach(t => {
+    const card = templateCard(t, { button: true });
+    card.setAttribute('aria-label', `${t.name} 템플릿으로 만들기`);
+    card.addEventListener('click', () => { state.tplId = t.id; go('make-edit'); });
+    cards.appendChild(card);
+  });
+}
+
+// 2) 문구 입력 + 미리보기 + 이미지 추출
+async function renderMakeEdit() {
+  // 공유 URL로 연 배너면 등록 당시 저장된 템플릿 복사본·문구를 그대로 씀
+  const sh = state.shared;
+  const tpl = sh ? sh.tpl : await TemplateStore.get(state.tplId);
+  if (!tpl) { toast('템플릿을 찾을 수 없어요. 다시 골라 주세요'); return go('make-pick'); }
+  // 입력칸은 비어 있는 상태로 시작 → 비어 있는 동안 미리보기·추출 이미지에는 예시 문구가 들어감
+  const texts = sh ? sh.texts : state.texts[tpl.id] || (state.texts[tpl.id] = {});
+  const used = tpl.texts;
+  // 배너 등록·공유 URL 기능: config.js 에서 enableShare: true 일 때만 보임 (공유 URL로 열었을 때는 항상)
+  const shareOn = !!sh || (window.BANNER_CONFIG || {}).enableShare === true;
+  view.innerHTML = `<div class="page sub">
+    <div><button class="back" id="back">← 템플릿 ${sh ? '' : '다시 '}고르기</button></div>
+    <div class="body"><div class="head"><div><h1>${sh ? (sh.editKey ? '등록한 배너' : '공유된 배너') : '배너 문구 입력하기'}</h1><p class="tpl">템플릿: <b id="tpl-name"></b></p></div></div>
+    <div class="split make">
+      <div class="panel" id="text-form"></div>
+      <div class="preview">
+        <canvas id="preview" aria-label="완성된 배너 미리보기"></canvas>
+        <div class="export">
+          <div class="seg" role="group" aria-label="추출 배율">${SCALES.map(s => `<button type="button" data-scale="${s}">${s}배 · ${DOC_W * s}×${DOC_H * s}</button>`).join('')}</div>
+          <div class="export-btns">
+            <button class="btn primary big" id="download">PNG 다운로드</button>
+            <button class="btn primary big" id="download-jpg">JPG 다운로드</button>
+          </div>
+        </div>
+        ${shareOn ? '<div class="export share" id="share-box"></div>' : ''}
+      </div>
+    </div></div></div>`;
+  $('#tpl-name').textContent = tpl.name;
+  $('#back').addEventListener('click', () => go('make-pick'));
+
+  const form = $('#text-form');
+  if (!used.length) form.innerHTML = '<p class="note">이 템플릿에는 입력할 문구가 없어요.</p>';
+  used.forEach(t => {
+    const id = 'text-' + t.id;
+    const d = document.createElement('div'); d.className = 'ctl big-field';
+    d.innerHTML = `<label for="${id}"></label><textarea class="inp" id="${id}" rows="2" placeholder="텍스트를 입력하세요."></textarea>`;
+    d.querySelector('label').textContent = t.name || '텍스트';
+    const ta = d.querySelector('textarea'); ta.value = texts[t.id] || '';
+    ta.addEventListener('input', () => {
+      texts[t.id] = ta.value; repaint();
+      if (sh) { if (sh.editKey) AutoSave.schedule(); else sh.dirty = true; } // 등록한 배너면 자동 저장
+    });
+    form.appendChild(d);
+  });
+  const c = $('#preview');
+  liveCanvas(() => paint(c, tpl, texts, SHARP));
+
+  const markScale = () => document.querySelectorAll('[data-scale]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.scale === state.scale));
+  markScale();
+  document.querySelector('.export .seg').addEventListener('click', e => {
+    const b = e.target.closest('[data-scale]'); if (b) { state.scale = +b.dataset.scale; markScale(); if (sh?.editKey) AutoSave.schedule(); }
+  });
+  $('#download').addEventListener('click', () => exportImage(tpl, texts, state.scale, 'png'));
+  $('#download-jpg').addEventListener('click', () => exportImage(tpl, texts, state.scale, 'jpg'));
+  if (shareOn) buildSharePanel($('#share-box'), tpl, texts);
+}
+
+async function exportImage(tpl, texts, scale, type = 'png') {
+  if (document.fonts) {
+    try { await Promise.all(tpl.texts.map(t => document.fonts.load(fontSpec(t, 40), texts[t.id] || t.sample))); } catch (e) {}
+  }
+  await imgReady(tpl.background.image);
+  const c = document.createElement('canvas');
+  paint(c, tpl, texts, scale);
+  const blob = await new Promise(res => type === 'jpg' ? c.toBlob(res, 'image/jpeg', .92) : c.toBlob(res, 'image/png'));
+  if (!blob) { toast('이미지를 만들지 못했어요. 다시 눌러 주세요'); return; }
+  const safe = tpl.name.replace(/[\\/:*?"<>|()]+/g, '').trim().replace(/\s+/g, '_') || 'banner';
+  saveFile(`${safe}_${DOC_W * scale}x${DOC_H * scale}.${type}`, blob);
+}
+async function saveFile(filename, blob) {
+  // claude.ai 웹 링크로 열었을 때는 그쪽 저장 기능을 사용
+  const dl = window.claude?.use ? await window.claude.use('downloads').catch(() => null) : null;
+  if (dl) {
+    try { await dl.save({ filename, data: blob }); toast('다운로드했어요'); }
+    catch (e) {
+      if (e?.code === 'declined') return;
+      toast(e?.code === 'rate_limited' ? '저장 창이 이미 열려 있어요' : '저장하지 못했어요. 다시 눌러 주세요');
+    }
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  toast('다운로드했어요');
+}
+
+
+/* ================= 배너 등록 · 공유 (Supabase) =================
+   - 설정은 config.js 의 window.BANNER_CONFIG = { supabaseUrl, supabaseAnonKey } (공개용 anon 키만)
+   - 등록하면 그 순간의 배너 전체(템플릿 복사본 + 입력 문구 + 레이어 위치·크기)를 banners 테이블에 저장
+   - 배경 이미지는 Storage(banner-images 버킷)에 올리고, 저장 데이터에는 이미지 주소만 넣음
+   - 공유 URL: 이 페이지 주소?banner=<배너 ID>
+   - 수정 권한: 등록할 때 만든 편집 키를 이 브라우저에만 보관. 서버에는 키의 해시만 저장하고,
+     수정은 update_banner 함수(키 확인)로만 가능. 키가 없으면 '새 배너로 등록'만 됨 */
+const CLOUD_BUCKET = 'banner-images';
+const BannerCloud = {
+  cfg() {
+    const c = window.BANNER_CONFIG || {};
+    // 주소 뒤에 /rest/v1/ 같은 게 붙어 있어도 프로젝트 주소만 씀
+    const url = String(c.supabaseUrl || '').trim().replace(/\/(rest|storage)\/v1(\/.*)?$/, '').replace(/\/+$/, '');
+    return { url, key: String(c.supabaseAnonKey || '').trim() };
+  },
+  // 브라우저에 넣으면 안 되는 Service Role(비밀) 키인지 확인
+  isSecretKey(key) {
+    if (/^sb_secret_/.test(key)) return true;
+    try { return JSON.parse(atob(key.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).role === 'service_role'; } catch (e) { return false; }
+  },
+  status() {
+    const { url, key } = this.cfg();
+    if (!url || !key) return 'missing';
+    if (this.isSecretKey(key)) return 'secret';
+    return 'ok';
+  },
+  ready() { return this.status() === 'ok'; },
+  headers(extra = {}) { const { key } = this.cfg(); return { apikey: key, Authorization: `Bearer ${key}`, ...extra }; },
+  async req(path, opts = {}) {
+    const res = await fetch(this.cfg().url + path, { ...opts, headers: this.headers(opts.headers) });
+    if (!res.ok) {
+      let msg = ''; try { msg = (await res.json()).message || ''; } catch (e) {}
+      throw new Error(`${res.status} ${msg}`.trim());
+    }
+    return res.status === 204 ? null : res.json().catch(() => null);
+  },
+  // data: URL 이미지는 Storage에 올리고 공개 주소를 돌려줌 (이미 주소면 그대로)
+  async uploadImage(bannerId, src) {
+    if (!src || !src.startsWith('data:')) return src || null;
+    const blob = await (await fetch(src)).blob();
+    const ext = blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg';
+    const path = `${bannerId}/background-${Date.now().toString(36)}.${ext}`;
+    await this.req(`/storage/v1/object/${CLOUD_BUCKET}/${path}`, { method: 'POST', headers: { 'Content-Type': blob.type, 'x-upsert': 'false' }, body: blob });
+    return `${this.cfg().url}/storage/v1/object/public/${CLOUD_BUCKET}/${path}`;
+  },
+  async rpc(name, args) {
+    return this.req(`/rest/v1/rpc/${name}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(args) });
+  },
+  async create(id, data, editKey) {
+    await this.req('/rest/v1/banners', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ id, data, edit_key_hash: await sha256Hex(editKey) }),
+    });
+  },
+  async load(id) {
+    const rows = await this.req(`/rest/v1/banners?id=eq.${encodeURIComponent(id)}&select=id,data,created_at,updated_at`);
+    return rows && rows[0] ? rows[0] : null;
+  },
+  // 마지막으로 저장된 시각만 가볍게 확인 (보는 사람 화면 자동 갱신용)
+  async updatedAt(id) {
+    const rows = await this.req(`/rest/v1/banners?id=eq.${encodeURIComponent(id)}&select=updated_at`);
+    return rows && rows[0] ? rows[0].updated_at : null;
+  },
+  async update(id, editKey, data) {
+    const ok = await this.req('/rest/v1/rpc/update_banner', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_id: id, p_key: editKey, p_data: data }),
+    });
+    if (ok !== true) throw new Error('수정 권한이 없어요');
+  },
+};
+/* ================= 관리자 로그인 =================
+   - 템플릿 등록·수정·삭제는 관리자 비밀번호가 맞을 때만 (서버의 save_template / delete_template 함수가 확인)
+   - 비밀번호 원문은 서버에 없고 해시만 있음. 브라우저에는 로그인한 동안만 보관
+   - Supabase 설정이 없으면(브라우저 저장 방식) 로그인 없이 누구나 관리 가능 (예전과 같음) */
+const AdminAuth = {
+  KEY: 'banner-admin-key',
+  key() {
+    try { return sessionStorage.getItem(this.KEY) || localStorage.getItem(this.KEY) || null; } catch (e) { return this._mem || null; }
+  },
+  isAdmin() { return !BannerCloud.ready() || !!this.key(); },
+  async login(pw, remember) {
+    const ok = await BannerCloud.rpc('is_admin', { p_key: pw });
+    if (ok !== true) return false;
+    try { (remember ? localStorage : sessionStorage).setItem(this.KEY, pw); } catch (e) { this._mem = pw; }
+    updateAdminUI();
+    return true;
+  },
+  logout() {
+    try { sessionStorage.removeItem(this.KEY); localStorage.removeItem(this.KEY); } catch (e) {}
+    this._mem = null;
+    updateAdminUI();
+  },
+};
+// 운영자 화면에는 [템플릿 관리] 메뉴를 숨김. 관리자는 주소 뒤에 ?admin 을 붙여 들어와 로그인
+function updateAdminUI() {
+  const q = new URLSearchParams(location.search);
+  const show = !BannerCloud.ready() || !!AdminAuth.key() || q.has('admin') || location.hash === '#templates';
+  const tab = document.querySelector('.tab[data-menu="templates"]');
+  if (tab) tab.hidden = !show;
+  const out = $('#admin-logout');
+  if (out) out.hidden = !(BannerCloud.ready() && AdminAuth.key());
+}
+$('#admin-logout').addEventListener('click', () => {
+  AdminAuth.logout(); toast('관리자 로그아웃했어요');
+  if (state.view.startsWith('manage')) go('make-pick');
+});
+async function renderAdminLogin() {
+  view.innerHTML = `<div class="page">
+    <div class="head"><div><h1>관리자 로그인</h1><p>템플릿 등록·수정·삭제는 관리자만 할 수 있어요. 관리자 비밀번호를 입력하세요.</p></div></div>
+    <form class="panel" id="admin-form" style="max-width:480px;display:flex;flex-direction:column;gap:14px">
+      <input class="inp-plain" id="admin-pw" type="password" autocomplete="current-password" placeholder="관리자 비밀번호" aria-label="관리자 비밀번호">
+      <label style="display:flex;gap:8px;align-items:center;font-size:15px"><input type="checkbox" id="admin-remember"> 이 PC에서 로그인 유지</label>
+      <button class="btn primary big" id="admin-login" type="submit">로그인</button>
+    </form></div>`;
+  const pw = $('#admin-pw'); pw.focus();
+  $('#admin-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!pw.value) { toast('비밀번호를 입력해 주세요'); return; }
+    const btn = $('#admin-login'); btn.disabled = true; btn.textContent = '확인 중…';
+    try {
+      if (await AdminAuth.login(pw.value, $('#admin-remember').checked)) { toast('관리자로 로그인했어요'); return go('manage-list'); }
+      toast('비밀번호가 맞지 않아요');
+    } catch (err) { toast(`로그인하지 못했어요 (${err.message})`); }
+    btn.disabled = false; btn.textContent = '로그인'; pw.select();
+  });
+}
+const needLogin = () => BannerCloud.ready() && !AdminAuth.key();
+
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+const newBannerId = () => crypto.randomUUID ? crypto.randomUUID()
+  : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = crypto.getRandomValues(new Uint8Array(1))[0] & 15; return (c === 'x' ? r : (r & 3) | 8).toString(16); });
+const newEditKey = () => [...crypto.getRandomValues(new Uint8Array(32))].map(b => b.toString(16).padStart(2, '0')).join('');
+// 내가 등록한 배너의 편집 키 (이 브라우저에만 보관)
+const EditKeys = {
+  KEY: 'banner-edit-keys',
+  all() { try { return JSON.parse(localStorage.getItem(this.KEY) || '{}') || {}; } catch (e) { return {}; } },
+  get(id) { return this.all()[id] || null; },
+  set(id, key) { const a = this.all(); a[id] = key; try { localStorage.setItem(this.KEY, JSON.stringify(a)); } catch (e) {} },
+};
+const shareUrl = id => `${location.origin === 'null' ? 'file://' : location.origin}${location.pathname}?banner=${id}`;
+
+// 등록할 데이터: 그 순간의 템플릿 복사본 + 입력 문구 + 레이어별 실제 위치·크기 (템플릿이 나중에 바뀌어도 그대로)
+async function bannerSnapshot(tpl, texts, bannerId) {
+  const c = document.createElement('canvas'); c.width = DOC_W; c.height = DOC_H;
+  const boxes = renderBanner(c.getContext('2d'), tpl, texts);
+  const template = clone(tpl);
+  template.background.image = await BannerCloud.uploadImage(bannerId, tpl.background.image);
+  return {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    canvas: { width: DOC_W, height: DOC_H },
+    sourceTemplateId: state.shared ? state.shared.data.sourceTemplateId : tpl.id,
+    template,                                               // 배경 + 텍스트 레이어 전체 설정 (순서 = 배열 순서)
+    texts: Object.fromEntries(tpl.texts.map(t => [t.id, texts[t.id] || ''])), // 사용자가 입력한 문구
+    layers: tpl.texts.map((t, i) => ({                      // 레이어 이름·순서와 실제 그려진 위치·크기
+      id: t.id, name: t.name, order: i, type: 'text',
+      x: Math.round(boxes[i].x), y: Math.round(boxes[i].y), width: Math.round(boxes[i].w), height: Math.round(boxes[i].h),
+    })),
+    exportScale: state.scale,
+  };
+}
+// 공유 URL로 열기: DB에서 불러와 마지막으로 저장된 상태 그대로 배너 제작 화면에
+// quiet: 자동 갱신으로 다시 불러올 때 (스크롤 위치 유지, 안내 없음)
+async function openSharedBanner(id, { quiet = false } = {}) {
+  if (!BannerCloud.ready()) { toast('저장소 설정(config.js)이 없어 공유 배너를 열 수 없어요'); return false; }
+  try {
+    const row = await BannerCloud.load(id);
+    if (!row) { if (!quiet) toast('배너를 찾을 수 없어요. 주소를 확인해 주세요'); return false; }
+    const d = row.data || {};
+    const tpl = newTemplate({ ...d.template, id: 'banner-' + row.id });
+    state.shared = { id: row.id, data: d, tpl, texts: { ...(d.texts || {}) }, editKey: EditKeys.get(row.id), updatedAt: row.updated_at, dirty: false };
+    if (d.exportScale) state.scale = d.exportScale;
+    const top = view.scrollTop;
+    await go('make-edit');
+    if (quiet) view.scrollTop = top;
+    return true;
+  } catch (e) { if (!quiet) toast('배너를 불러오지 못했어요 (' + e.message + ')'); return false; }
+}
+// 자동 저장: 등록한 배너(편집 키가 있는 브라우저)는 문구를 고치면 잠시 뒤 저장 → 같은 공유 URL에 바로 반영
+const AutoSave = {
+  DELAY: 1200, timer: 0, saving: false, again: false, target: null, // target: 저장할 배너 (화면을 떠나도 끝까지 저장)
+  schedule() {
+    if (!state.shared?.editKey || !BannerCloud.ready()) return;
+    this.target = state.shared;
+    clearTimeout(this.timer); this.timer = setTimeout(() => this.run(), this.DELAY);
+    this.status('pending');
+  },
+  flush() { if (this.timer) this.run(); }, // 화면을 떠나거나 창을 닫기 전에 바로 저장
+  async run() {
+    clearTimeout(this.timer); this.timer = 0;
+    const sh = this.target; if (!sh?.editKey) return;
+    if (this.saving) { this.again = true; return; }
+    this.saving = true; this.status('saving');
+    try {
+      const data = await bannerSnapshot(sh.tpl, sh.texts, sh.id);
+      await BannerCloud.update(sh.id, sh.editKey, data);
+      sh.data = data; this.status('saved');
+    } catch (e) { this.status('error', e.message); }
+    finally { this.saving = false; if (this.again) { this.again = false; this.run(); } }
+  },
+  status(s, msg = '') {
+    const el = $('#save-status'); if (!el) return;
+    const time = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    el.dataset.state = s;
+    el.textContent = { pending: '고친 내용 저장 대기 중…', saving: '저장 중…', saved: `자동 저장됨 · ${time} (공유 URL에 반영)`, error: `저장하지 못했어요 (${msg}) · [지금 저장]을 눌러 주세요` }[s];
+  },
+};
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') AutoSave.flush(); });
+window.addEventListener('pagehide', () => AutoSave.flush());
+// 보는 사람 화면 자동 갱신: 공유 배너를 열어 두면 몇 초마다 새로 저장됐는지 확인해서 최신 내용으로 바꿈
+const LiveView = {
+  EVERY: 8000, timer: 0,
+  start() {
+    this.stop();
+    const sh = state.shared;
+    if (!sh || sh.editKey || !BannerCloud.ready()) return; // 등록한 사람(편집 중)은 확인하지 않음
+    this.timer = setInterval(() => this.check(), this.EVERY);
+  },
+  stop() { clearInterval(this.timer); this.timer = 0; },
+  async check() {
+    const sh = state.shared;
+    if (!sh || state.view !== 'make-edit' || document.visibilityState === 'hidden') return;
+    let at; try { at = await BannerCloud.updatedAt(sh.id); } catch (e) { return; }
+    if (!at || at === sh.updatedAt || state.shared !== sh) return;
+    if (sh.dirty) { // 보는 사람이 문구를 고치는 중이면 덮어쓰지 않고 알려 줌
+      const n = $('#update-note'); if (n) n.hidden = false;
+      return;
+    }
+    await openSharedBanner(sh.id, { quiet: true });
+    toast('등록한 사람이 고친 최신 내용으로 바뀌었어요');
+  },
+};
+function leaveShared() {
+  if (!state.shared && !new URLSearchParams(location.search).has('banner')) return;
+  state.shared = null;
+  try { history.replaceState(null, '', location.pathname + location.hash); } catch (e) {}
+}
+async function copyText(s) {
+  try { await navigator.clipboard.writeText(s); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea'); ta.value = s; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch (er) {}
+    ta.remove(); return ok;
+  }
+}
+// 배너 제작 화면 아래 [등록 · 공유] 칸
+function buildSharePanel(box, tpl, texts) {
+  const st = BannerCloud.status(), sh = state.shared;
+  const canEdit = !!(sh && sh.editKey);
+  box.innerHTML = `<div class="share-head"><b>배너 등록 · 공유</b>${sh ? `<span class="share-id">배너 ID ${sh.id.slice(0, 8)}</span>` : ''}</div>
+    ${st !== 'ok' ? `<p class="note">${st === 'secret' ? 'config.js에 Service Role(비밀) 키가 들어 있어요. 보안상 사용할 수 없으니 anon(공개) 키로 바꿔 주세요.' : '저장소(Supabase) 설정 전이라 등록할 수 없어요. config.js에 Project URL과 anon 키를 넣어 주세요.'}</p>` : ''}
+    ${canEdit ? `<p class="save-status" id="save-status" role="status" data-state="saved">자동 저장 켜짐 · 문구를 고치면 같은 공유 URL에 바로 반영돼요</p>` : ''}
+    ${sh && !canEdit ? `<p class="note">등록한 사람이 내용을 고치면 이 화면도 자동으로 최신 내용으로 바뀌어요.</p>
+      <p class="note update-note" id="update-note" hidden>새로 저장된 내용이 있어요. <button class="link" id="reload-latest">최신 내용 불러오기</button> (지금 고친 문구는 사라져요)</p>` : ''}
+    <div class="share-btns">
+      ${canEdit ? `<button class="btn big" id="save-banner">지금 저장</button>` : ''}
+      <button class="btn ${canEdit ? '' : 'primary '}big" id="register">${sh ? '새 배너로 등록' : '배너 등록하고 공유 URL 만들기'}</button>
+    </div>
+    <div class="share-url" id="share-url" ${sh ? '' : 'hidden'}>
+      <input class="inp-plain" id="share-link" readonly aria-label="공유 URL">
+      <button class="btn" id="copy-url">URL 복사</button>
+    </div>`;
+  const showUrl = id => { $('#share-url').hidden = false; $('#share-link').value = shareUrl(id); };
+  if (sh) showUrl(sh.id);
+  box.querySelectorAll('#register, #save-banner').forEach(b => b.disabled = st !== 'ok');
+  $('#copy-url').addEventListener('click', async () => toast(await copyText($('#share-link').value) ? '공유 URL을 복사했어요' : 'URL을 직접 선택해서 복사해 주세요'));
+  const busy = (on, b) => { box.querySelectorAll('button').forEach(x => x.disabled = on || (x.id !== 'copy-url' && st !== 'ok')); if (b) b.textContent = on ? '저장 중…' : b.dataset.label; };
+  box.querySelectorAll('#register, #save-banner').forEach(b => b.dataset.label = b.textContent);
+  $('#register').addEventListener('click', async e => {
+    const b = e.currentTarget; busy(true, b);
+    try {
+      const id = newBannerId(), key = newEditKey();
+      const data = await bannerSnapshot(tpl, texts, id);
+      await BannerCloud.create(id, data, key);
+      EditKeys.set(id, key);
+      state.shared = { id, data, tpl: newTemplate({ ...data.template, id: 'banner-' + id }), texts: { ...data.texts }, editKey: key };
+      try { history.replaceState(null, '', `${location.pathname}?banner=${id}${location.hash}`); } catch (er) {}
+      await go('make-edit');
+      toast('배너를 등록했어요. 공유 URL을 복사해 쓰세요');
+    } catch (er) { busy(false, b); toast('등록하지 못했어요 (' + er.message + ')'); }
+  });
+  $('#save-banner')?.addEventListener('click', async e => {
+    const b = e.currentTarget; busy(true, b);
+    AutoSave.target = state.shared; await AutoSave.run();
+    busy(false, b);
+    if ($('#save-status')?.dataset.state === 'saved') toast('저장했어요. 같은 공유 URL에 반영돼요');
+  });
+  $('#reload-latest')?.addEventListener('click', () => openSharedBanner(sh.id, { quiet: true }));
+  LiveView.start();
+}
+/* ================= A. 템플릿 관리 ================= */
+// 1) 템플릿 목록
+async function renderManageList() {
+  if (needLogin()) return renderAdminLogin();
+  const list = await TemplateStore.list();
+  // 예전 방식(이 브라우저)에 저장된 템플릿 중 아직 서버에 없는 것
+  const onServer = new Set(list.map(t => t.id));
+  const pending = TemplateStore.cloud() && !TemplateStore.lastError ? TemplateStore.localTemplates().filter(t => !onServer.has(t.id)) : [];
+  // 템플릿이 없으면 제목 옆 버튼 대신 큰 점선 박스 가운데에 [+ 새 템플릿 등록]
+  view.innerHTML = `<div class="page">
+    <div class="head"><div><h1>템플릿 관리</h1><p>템플릿을 추가한 후 각 요소의 위치와 크기 등 세부 수치를 입력하여 배너 템플릿을 제작하세요.</p></div>
+      ${list.length ? `<span class="spacer"></span><button class="btn primary big" id="new-tpl">+ 새 템플릿 등록</button>` : ''}</div>
+    ${TemplateStore.lastError ? `<p class="note">서버에서 템플릿을 불러오지 못했어요 (${TemplateStore.lastError}).</p>` : ''}
+    ${pending.length ? `<div class="panel" id="migrate-box" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><span style="flex:1;min-width:240px">이 브라우저에만 저장된 템플릿이 <b>${pending.length}개</b> 있어요. 서버로 올리면 운영자들도 볼 수 있어요.</span><button class="btn primary" id="migrate">서버로 올리기</button></div>` : ''}
+    ${list.length ? `<div class="cards" id="cards"></div>` : `<div class="drop-box empty-list" id="empty-box"><button class="btn primary big" id="new-tpl">+ 새 템플릿 등록</button></div>`}</div>`;
+  $('#migrate')?.addEventListener('click', async e => {
+    const btn = e.currentTarget; btn.disabled = true;
+    let done = 0;
+    for (const t of pending) {
+      btn.textContent = `올리는 중… (${done + 1}/${pending.length})`;
+      if (!(await TemplateStore.save(t))) break;
+      done++;
+    }
+    toast(done === pending.length ? `템플릿 ${done}개를 서버로 올렸어요` : `${done}개만 올렸어요. 다시 시도해 주세요`);
+    go('manage-list');
+  });
+  const startNew = () => { state.draft = newTemplate(); state.draftIsNew = true; go('manage-form'); };
+  $('#new-tpl').addEventListener('click', e => { e.stopPropagation(); startNew(); });
+  if (!list.length) { $('#empty-box').addEventListener('click', startNew); return; }
+  const cards = $('#cards');
+  list.forEach(t => {
+    const card = templateCard(t, { meta: fmtDate(t.updatedAt) });
+    const acts = document.createElement('div'); acts.className = 'card-acts';
+    acts.innerHTML = `<button class="btn small" data-act="edit">수정</button><button class="btn small danger" data-act="del">삭제</button>`;
+    acts.querySelector('[data-act=edit]').addEventListener('click', () => { state.draft = clone(t); state.draftIsNew = false; go('manage-form'); });
+    // 삭제는 두 번 눌러야 함 (실수 방지)
+    const del = acts.querySelector('[data-act=del]');
+    let timer;
+    del.addEventListener('click', async () => {
+      if (!del.classList.contains('armed')) {
+        del.classList.add('armed'); del.textContent = '한 번 더 누르면 삭제';
+        timer = setTimeout(() => { del.classList.remove('armed'); del.textContent = '삭제'; }, 3000);
+        return;
+      }
+      clearTimeout(timer);
+      if (await TemplateStore.remove(t.id)) {
+        delete state.texts[t.id];
+        toast(`'${t.name}' 템플릿을 삭제했어요`);
+        go('manage-list');
+      }
+    });
+    card.appendChild(acts);
+    cards.appendChild(card);
+  });
+}
+
+// 2) 템플릿 등록·수정: 정해진 입력 항목 + 오른쪽 미리보기
+const FD = {
+  x:          { key: 'x', ui: 'number', label: 'X 위치', unit: 'px',
+                labelIf: o => o.align === 'right' ? 'X 위치 (오른쪽에서)' : o.align === 'center' ? 'X 위치 (가운데 정렬)' : 'X 위치',
+                disabledIf: o => o.align === 'center' },
+  y:          { key: 'y', ui: 'number', label: 'Y 위치', unit: 'px' },
+  fontSize:   { key: 'fontSize', ui: 'number', label: '글자 크기', unit: 'px', min: 6, max: 300 },
+  fontFamily: { key: 'fontFamily', ui: 'select', label: '글꼴', full: true, rebuild: true,
+                options: Object.entries(FONTS).map(([k, v]) => [k, v.label]),
+                // 바꾼 글꼴에 지금 굵기가 없으면 가장 가까운 굵기로
+                after: o => { o.fontWeight = nearestWeight(o.fontFamily, o.fontWeight); } },
+  // 굵기 목록은 고른 글꼴에 있는 굵기만
+  fontWeight: { key: 'fontWeight', ui: 'select', label: '굵기', num: true,
+                options: o => fontOf(o).weights.map(w => [w, fontOf(o).names?.[w] || WEIGHT_NAMES[w]]) },
+  color:      { key: 'color', ui: 'color', label: '글자색', full: true },
+  strokeColor: { key: 'strokeColor', ui: 'color', label: '선색' },
+  strokeWidth: { key: 'strokeWidth', ui: 'number', label: '선 굵기', unit: 'px', step: .5, min: 0, max: 50 },
+  align:      { key: 'align', ui: 'segment', label: '정렬', full: true, rebuild: true, options: [['left', '왼쪽'], ['center', '가운데'], ['right', '오른쪽']] },
+  lineHeight: { key: 'lineHeightPx', ui: 'number', label: '줄 간격', unit: 'px', step: 1, min: 1, max: 600 },
+  spacing:    { key: 'letterSpacingPct', ui: 'number', label: '자간', unit: '%', step: .1, min: -50, max: 100 },
+  sample:     { key: 'sample', ui: 'textarea', label: '예시 문구 (사용자가 처음 보는 문구)', full: true },
+  fill:       { key: 'fill', ui: 'segment', label: '배경색 방식', full: true, rebuild: true, options: [['solid', '단색'], ['gradient', '그라데이션']] },
+  bgColor:    { key: 'color', ui: 'color', label: '색', full: o => o.fill !== 'gradient', labelIf: o => o.fill === 'gradient' ? '시작 색' : '색' },
+  bgColor2:   { key: 'color2', ui: 'color', label: '끝 색', show: o => o.fill === 'gradient' },
+  angle:      { key: 'angle', ui: 'number', label: '각도', min: 0, max: 360, full: true, show: o => o.fill === 'gradient' },
+};
+// 글자 영역 크기는 글자에 맞춰 자동 (Hug × Hug). 저장된 w 값은 쓰지 않음
+// 텍스트 수정 창: 묶음끼리 넓게 띄움 (이름·예시 문구 / 위치 / 글자 모양·정렬 / 글자색)
+const TEXT_GROUPS = [
+  [], // 텍스트 이름 (예시 문구 입력칸은 없음)
+  [FD.x, FD.y],
+  [FD.fontFamily, FD.fontSize, FD.fontWeight, FD.lineHeight, FD.spacing, FD.align],
+  [FD.color],
+];
+const TEXT_FIELDS = TEXT_GROUPS.flat();
+const BG_FIELDS = [FD.fill, FD.bgColor, FD.bgColor2, FD.angle];
+
+async function renderManageForm() {
+  if (needLogin()) return renderAdminLogin();
+  const d = state.draft;
+  if (!d) return go('manage-list');
+  state.openText = null; state.textSteps = {}; // 들어올 때는 모든 텍스트를 접어 둠
+  state.draftOrig = clone(d); // [되돌리기]용: 이 화면에 들어왔을 때(마지막 저장) 상태
+  view.innerHTML = `<div class="page sub">
+    <div><button class="back" id="back">← 템플릿 목록</button></div>
+    <div class="body"><div class="head"><div><h1>${state.draftIsNew ? '새 템플릿 등록' : '템플릿 수정'}</h1><p>디자이너에게 받은 값을 그대로 입력하세요. 오른쪽에서 바로 확인할 수 있어요.</p></div>
+      <span class="spacer"></span><button class="btn big" id="revert">되돌리기</button><button class="btn primary big" id="save">저장하기</button></div>
+    <div class="split">
+      <div class="panel" id="tpl-form"></div>
+      <div class="preview guide">
+        <canvas id="preview" aria-label="템플릿 미리보기"></canvas>
+        <p class="cap">점선은 텍스트가 배치될 영역을 나타내며, 배너 이미지에는 표시되지 않습니다. 좌표는 640×360px 기준입니다.</p>
+      </div>
+    </div></div></div>`;
+  $('#back').addEventListener('click', () => go('manage-list'));
+  $('#revert').addEventListener('click', revertDraft);
+  $('#save').addEventListener('click', saveDraft);
+  buildTemplateForm();
+  const c = $('#preview');
+  liveCanvas(() => paint(c, state.draft, sampleTexts(state.draft), SHARP, true));
+}
+// 되돌리기: 이 화면에서 바꾼 내용을 모두 버리고 들어왔을 때 상태로 (화면은 그대로)
+function revertDraft() {
+  if (JSON.stringify(state.draft) === JSON.stringify(state.draftOrig)) { toast('바뀐 내용이 없어요'); return; }
+  state.draft = clone(state.draftOrig);
+  state.openText = null; state.textSteps = {};
+  buildTemplateForm(); repaint();
+  toast('처음 상태로 되돌렸어요');
+}
+async function saveDraft() {
+  const d = state.draft;
+  d.name = d.name.trim();
+  if (!d.name) { toast('템플릿 이름을 입력해 주세요'); $('#f-name')?.focus(); return; }
+  if (!d.texts.length) { toast('텍스트를 하나 이상 추가해 주세요'); return; }
+  const unnamed = d.texts.find(t => !t.name.trim());
+  if (unnamed) {
+    toast('이름이 없는 텍스트가 있어요. 이름을 입력해 주세요');
+    state.openText = unnamed.id; buildTemplateForm(); $('#tname-' + unnamed.id)?.focus(); return;
+  }
+  d.texts.forEach(t => { t.name = t.name.trim(); });
+  state.openText = null;
+  const saved = await TemplateStore.save(d);
+  if (!saved) return;
+  toast(state.draftIsNew ? `'${d.name}' 템플릿을 등록했어요` : `'${d.name}' 템플릿을 저장했어요`);
+  state.draft = null;
+  go('manage-list');
+}
+function buildTemplateForm() {
+  const d = state.draft, form = $('#tpl-form');
+  form.innerHTML = '';
+  const section = (title, extra = '') => {
+    const s = document.createElement('section'); s.className = 'sec';
+    s.innerHTML = `<div class="sec-head"><h2>${title}</h2><span class="spacer"></span>${extra}</div>`;
+    form.appendChild(s); return s;
+  };
+  const grid = (sec, fields, obj) => {
+    const g = document.createElement('div'); g.className = 'grid';
+    fields.filter(f => !f.show || f.show(obj)).forEach(f => g.appendChild(buildControl(f, obj, (key, v) => {
+      obj[key] = v; f.after?.(obj); repaint();
+      if (f.rebuild) buildTemplateForm();
+    })));
+    sec.appendChild(g);
+    return g;
+  };
+
+  // 기본 정보
+  const info = section('기본 정보');
+  info.insertAdjacentHTML('beforeend', `<div class="ctl"><label for="f-name">템플릿 이름</label><div class="inp"><input id="f-name" maxlength="40" placeholder="예: 2026 겨울 특집 메인"></div></div>`);
+  const nameIn = info.querySelector('#f-name'); nameIn.value = d.name;
+  nameIn.addEventListener('input', () => { d.name = nameIn.value; });
+
+  // 배경
+  const bg = section('배경');
+  const b = d.background;
+  const bgBody = document.createElement('div'); bgBody.className = 'bg-body';
+  bg.appendChild(bgBody);
+  const box = document.createElement('div'); box.className = 'img-box';
+  if (b.image) {
+    box.innerHTML = `<img alt="배경 이미지"><span class="spacer"></span><div class="acts"><button class="btn small" data-act="change">바꾸기</button><button class="btn small danger" data-act="remove">빼기</button></div>`;
+    box.querySelector('img').src = b.image;
+    box.querySelector('[data-act=remove]').addEventListener('click', () => { b.image = null; buildTemplateForm(); repaint(); });
+  } else {
+    box.classList.add('empty-img', 'drop-box');
+    box.addEventListener('click', e => { if (!e.target.closest('button')) $('#bg-file').click(); });
+    box.title = '16:9가 아닌 이미지는 가운데 기준으로 잘려요';
+    box.innerHTML = `<button class="btn small primary" data-act="change">+ 배경 삽입하기</button>`;
+  }
+  box.querySelector('[data-act=change]').addEventListener('click', () => $('#bg-file').click());
+  bgBody.appendChild(box);
+  // 이미지 파일을 박스에 끌어다 놓아도 들어감 (이미지가 있으면 바뀜)
+  box.addEventListener('dragover', e => {
+    if (![...(e.dataTransfer?.types || [])].includes('Files')) return;
+    e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; box.classList.add('dragging');
+  });
+  box.addEventListener('dragleave', e => { if (!box.contains(e.relatedTarget)) box.classList.remove('dragging'); });
+  box.addEventListener('drop', e => {
+    e.preventDefault(); box.classList.remove('dragging');
+    const f = [...(e.dataTransfer?.files || [])].find(x => x.type.startsWith('image/')) || e.dataTransfer?.files?.[0];
+    if (f) setDraftImage(f);
+  });
+  if (!b.image) grid(bgBody, BG_FIELDS, b); // 배경 이미지가 있으면 배경색 설정은 숨김 (이미지를 빼면 다시 보임)
+
+  // 텍스트: 제목 오른쪽 '+ 추가하기' → 아래에 '텍스트 1' 같은 항목이 생김
+  //   항목을 누르면 수정 창(이름·설정 + [삭제] [완료])이 펼쳐지고, 완료하면 다시 한 줄로 접힘
+  const ts = section('텍스트');
+  const add = document.createElement('button'); add.className = 'add-text'; add.type = 'button'; add.id = 'add-text'; add.textContent = '+ 텍스트 추가하기';
+  add.addEventListener('click', addText);
+  ts.querySelector('.sec-head').appendChild(add);
+  d.texts.forEach(t => {
+    if (t.id !== state.openText) {
+      const row = document.createElement('button'); row.className = 'text-item'; row.type = 'button';
+      row.innerHTML = `<span class="t-badge" aria-hidden="true">T</span><span class="t-info"><b></b></span>`;
+      row.querySelector('b').textContent = t.name || '이름 없음';
+      row.setAttribute('aria-label', `${t.name || '이름 없음'} 수정하기`);
+      row.addEventListener('click', () => openText(t.id));
+      ts.appendChild(row);
+      return;
+    }
+    // 새로 추가한 텍스트는 한 단계씩: 이름 → 위치 → 글자 모양·정렬 → 글자색
+    // (이미 완료한 텍스트는 처음부터 전부 보임)
+    const step = textStep(t);
+    const last = step >= TEXT_GROUPS.length - 1;
+    const card = document.createElement('div'); card.className = 'text-edit';
+    const nid = 'tname-' + t.id;
+    TEXT_GROUPS.slice(0, step + 1).forEach((fields, i) => {
+      const g = grid(card, fields, t);
+      g.dataset.step = i;
+      if (i === 0) { // 첫 묶음 맨 위에 텍스트 이름
+        g.insertAdjacentHTML('afterbegin', `<div class="ctl full"><label for="${nid}">텍스트 레이어 이름</label><div class="inp"><input id="${nid}" maxlength="30" placeholder="예: 타이틀, 날짜, 장소"></div></div>`);
+        const nameInput = g.querySelector('#' + nid); nameInput.value = t.name;
+        nameInput.addEventListener('input', () => { t.name = nameInput.value; repaint(); });
+      }
+      if (i === TEXT_GROUPS.length - 1) addStrokeControls(g, t); // 글자색 아래 선색
+    });
+    // 입력칸에서 Enter = [다음] (마지막 단계에서는 [완료])
+    card.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+      e.preventDefault();
+      last ? finishText(t) : nextTextStep(t);
+    });
+    const acts = document.createElement('div'); acts.className = 'text-acts';
+    acts.innerHTML = `<button class="btn danger" data-act="del">삭제</button>` +
+      (last ? `<button class="btn primary" data-act="done">완료</button>` : `<button class="btn primary" data-act="next">다음</button>`);
+    acts.querySelector('[data-act=del]').addEventListener('click', () => {
+      d.texts = d.texts.filter(x => x !== t); state.openText = null; delete state.textSteps[t.id];
+      buildTemplateForm(); repaint();
+      toast(t.name ? `'${t.name}' 텍스트를 삭제했어요` : '텍스트를 삭제했어요');
+    });
+    acts.querySelector('[data-act=done]')?.addEventListener('click', () => finishText(t));
+    acts.querySelector('[data-act=next]')?.addEventListener('click', () => nextTextStep(t));
+    card.appendChild(acts);
+    ts.appendChild(card);
+  });
+}
+// 선 (글자 테두리): [선 추가하기 ●] 스위치 줄. 켜면 아래에 선색 · 선 굵기 칸이 나옴
+function addStrokeControls(g, t) {
+  const sw = document.createElement('input');
+  sw.type = 'checkbox'; sw.className = 'switch'; sw.setAttribute('role', 'switch'); sw.id = 'stroke-on-' + t.id;
+  sw.checked = !!t.strokeOn;
+  sw.addEventListener('change', () => {
+    t.strokeOn = sw.checked;
+    if (t.strokeOn && !t.strokeColor) t.strokeColor = t.color; // 처음 켜면 글자색과 같은 색으로 시작
+    buildTemplateForm(); repaint();
+    document.getElementById('stroke-on-' + t.id)?.focus();
+  });
+  const row = document.createElement('div'); row.className = 'ctl full toggle-row' + (t.strokeOn ? ' on' : '');
+  row.innerHTML = `<label for="${sw.id}">선 추가하기</label>`;
+  row.appendChild(sw); g.appendChild(row);
+  if (!t.strokeOn) return;
+  // 선색 · 선 굵기: 라벨은 화면에서 숨김 (화면 읽기 프로그램용으로만 남김)
+  const onChange = (key, v) => { t[key] = v; repaint(); };
+  for (const f of [FD.strokeColor, FD.strokeWidth]) {
+    const c = buildControl(f, t, onChange);
+    c.classList.add('stroke-ctl'); c.querySelector('label').classList.add('sr-only');
+    g.appendChild(c);
+  }
+}
+// 텍스트 수정 창에 몇 번째 묶음까지 보일지 (기록이 없으면 전부)
+const textStep = t => state.textSteps[t.id] ?? TEXT_GROUPS.length - 1;
+function nextTextStep(t) {
+  const step = textStep(t);
+  if (step === 0) {
+    t.name = t.name.trim();
+    if (!t.name) { toast('텍스트 이름을 입력해 주세요'); $('#tname-' + t.id)?.focus(); return; }
+  }
+  state.textSteps[t.id] = Math.min(step + 1, TEXT_GROUPS.length - 1);
+  buildTemplateForm(); repaint();
+  // 새로 나온 묶음의 첫 입력칸으로
+  const g = document.querySelector(`.text-edit .grid[data-step="${step + 1}"]`);
+  const first = g?.querySelector('input:not([type=color]), select, button');
+  first?.focus(); if (first?.select) first.select();
+  g?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+function openText(id) {
+  const cur = state.draft.texts.find(t => t.id === state.openText);
+  if (cur && !cur.name.trim()) { toast('펼쳐 둔 텍스트의 이름을 먼저 입력해 주세요'); $('#tname-' + cur.id)?.focus(); return; }
+  state.openText = id; buildTemplateForm();
+  $('#tname-' + id)?.focus();
+}
+function finishText(t) {
+  t.name = t.name.trim();
+  if (!t.name) { toast('텍스트 이름을 입력해 주세요'); $('#tname-' + t.id)?.focus(); return false; }
+  delete state.textSteps[t.id]; // 완료한 텍스트는 다시 열면 전부 보임
+  state.openText = null; buildTemplateForm(); repaint();
+  return true;
+}
+function addText() {
+  const d = state.draft, last = d.texts[d.texts.length - 1];
+  // 새 텍스트는 마지막 텍스트 바로 아래에 놓음
+  const y = last ? Math.min(DOC_H - 40, Math.round(last.y + (last.lineHeightPx || last.fontSize * 1.3) * String(last.sample).split('\n').length + 12)) : 48;
+  const cur = d.texts.find(x => x.id === state.openText);
+  if (cur && !cur.name.trim()) { toast('펼쳐 둔 텍스트의 이름을 먼저 입력해 주세요'); $('#tname-' + cur.id)?.focus(); return; }
+  // 이름은 '텍스트 1', '텍스트 2' … 중 아직 안 쓴 번호로 (나중에 수정 창에서 바꿀 수 있음)
+  const names = new Set(d.texts.map(x => x.name));
+  let n = 1; while (names.has(`텍스트 ${n}`)) n++;
+  const t = newText({ y, name: `텍스트 ${n}` });
+  d.texts.push(t);
+  // 바로 수정 창을 열고 이름부터 입력 (이름 → 위치 → 글자 모양 → 글자색 순서로 나옴)
+  state.openText = t.id; state.textSteps[t.id] = 0;
+  buildTemplateForm(); repaint();
+  const nameIn = $('#tname-' + t.id);
+  if (nameIn) { nameIn.focus(); nameIn.select(); nameIn.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+}
+// 배경 이미지: 16:9(640×360의 2배 해상도)로 꽉 채워 잘라서 보관
+// 박스 밖에 파일을 잘못 놓아도 브라우저가 이미지를 열어 작업 화면이 사라지지 않게
+window.addEventListener('dragover', e => { if ([...(e.dataTransfer?.types || [])].includes('Files')) e.preventDefault(); });
+window.addEventListener('drop', e => { if ([...(e.dataTransfer?.types || [])].includes('Files')) e.preventDefault(); });
+$('#bg-file').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (f && state.draft) await setDraftImage(f);
+});
+async function setDraftImage(f) {
+  if (!f.type.startsWith('image/')) { toast('이미지 파일만 넣을 수 있어요'); return; }
+  try {
+    state.draft.background.image = fitToCanvas(await readImage(f));
+    if (!state.draft.name.trim()) state.draft.name = f.name.replace(/\.[^.]+$/, '');
+    buildTemplateForm(); repaint();
+    toast('배경 이미지를 넣었어요');
+  } catch (err) { toast('이 이미지는 열 수 없어요. JPG나 PNG로 넣어 주세요'); }
+}
+function readImage(f) {
+  return new Promise((ok, no) => {
+    const url = URL.createObjectURL(f), im = new Image();
+    im.onload = () => { URL.revokeObjectURL(url); ok(im); };
+    im.onerror = () => { URL.revokeObjectURL(url); no(new Error('image')); };
+    im.src = url;
+  });
+}
+function fitToCanvas(im) {
+  const W = DOC_W * 2, H = DOC_H * 2;
+  const iw = im.naturalWidth, ih = im.naturalHeight, s = Math.max(W / iw, H / ih);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); x.imageSmoothingQuality = 'high';
+  x.drawImage(im, (W - iw * s) / 2, (H - ih * s) / 2, iw * s, ih * s);
+  // 투명한 부분이 있으면 PNG, 아니면 용량이 작은 JPG로 보관
+  const a = x.getImageData(0, 0, W, H).data;
+  let clear = false; for (let i = 3; i < a.length; i += 4) if (a[i] < 255) { clear = true; break; }
+  return clear ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', .9);
+}
+
+/* 입력 항목 하나 만들기: obj[f.key]를 보여 주고, 바뀌면 onChange(key, value) */
+let fieldSeq = 0;
+const fmt = v => (v == null ? '' : Math.round(v * 100) / 100);
+function buildControl(f, obj, onChange) {
+  const wrapEl = document.createElement('div');
+  const full = typeof f.full === 'function' ? f.full(obj) : f.full;
+  wrapEl.className = 'ctl' + (full ? ' full' : '');
+  const fid = 'f-' + f.key + '-' + (++fieldSeq);
+  const label = f.labelIf ? f.labelIf(obj) : f.label;
+  const v = obj[f.key];
+
+  if (f.ui === 'number' || f.ui === 'select') {
+    wrapEl.innerHTML = `<label for="${fid}">${label}</label><div class="inp"></div>`;
+    const box = wrapEl.querySelector('.inp');
+    if (f.ui === 'number') {
+      box.innerHTML = `<input id="${fid}" type="number" step="${f.step || 1}"${f.min != null ? ` min="${f.min}"` : ''}${f.max != null ? ` max="${f.max}"` : ''}>${f.unit ? `<span class="unit">${f.unit}</span>` : ''}`;
+      const inp = box.querySelector('input'); inp.value = fmt(v);
+      if (f.disabledIf?.(obj)) { inp.disabled = true; box.classList.add('off'); }
+      inp.addEventListener('input', () => { const n = parseFloat(inp.value); if (!isNaN(n)) onChange(f.key, clamp(n, f.min ?? -1e5, f.max ?? 1e5)); });
+      inp.addEventListener('blur', () => { inp.value = fmt(obj[f.key]); });
+    } else {
+      box.innerHTML = `<select id="${fid}">${(typeof f.options === "function" ? f.options(obj) : f.options).map(([val, txt]) => `<option value="${val}">${txt}</option>`).join('')}</select>`;
+      const sel = box.querySelector('select'); sel.value = v;
+      sel.addEventListener('change', () => onChange(f.key, f.num ? +sel.value : sel.value));
+    }
+  } else if (f.ui === 'textarea') {
+    wrapEl.innerHTML = `<label for="${fid}">${label}</label><textarea class="inp" id="${fid}" rows="2"></textarea>`;
+    const ta = wrapEl.querySelector('textarea'); ta.value = v;
+    ta.addEventListener('input', () => onChange(f.key, ta.value));
+  } else if (f.ui === 'segment') {
+    wrapEl.innerHTML = `<span class="lbl">${label}</span><div class="seg" role="group" aria-label="${label}">${f.options.map(([val, txt]) => `<button type="button" data-val="${val}">${txt}</button>`).join('')}</div>`;
+    const mark = cur => wrapEl.querySelectorAll('[data-val]').forEach(b => b.setAttribute('aria-pressed', b.dataset.val === cur));
+    mark(v);
+    wrapEl.querySelector('.seg').addEventListener('click', e => { const b = e.target.closest('[data-val]'); if (!b) return; mark(b.dataset.val); onChange(f.key, b.dataset.val); });
+  } else if (f.ui === 'color') {
+    wrapEl.innerHTML = `<label for="${fid}">${label}</label><div class="color"><input type="color" aria-label="${label} 고르기"><div class="inp"><input id="${fid}" maxlength="7" spellcheck="false"></div></div>`;
+    const pick = wrapEl.querySelector('input[type=color]'), hex = wrapEl.querySelector('#' + CSS.escape(fid));
+    pick.value = v; hex.value = v.toUpperCase();
+    pick.addEventListener('input', () => { hex.value = pick.value.toUpperCase(); onChange(f.key, pick.value.toLowerCase()); });
+    hex.addEventListener('input', () => {
+      let s = hex.value.trim(); if (!s.startsWith('#')) s = '#' + s;
+      if (/^#[0-9a-f]{3}$/i.test(s)) s = '#' + [...s.slice(1)].map(c => c + c).join('');
+      if (/^#[0-9a-f]{6}$/i.test(s)) { pick.value = s.toLowerCase(); onChange(f.key, s.toLowerCase()); }
+    });
+    hex.addEventListener('blur', () => { hex.value = String(obj[f.key]).toUpperCase(); });
+  } else if (f.ui === 'range') {
+    wrapEl.innerHTML = `<label for="${fid}">${label}</label><div class="range"><input type="range" min="${f.min}" max="${f.max}" aria-label="${label}"><div class="inp"><input id="${fid}" type="number" min="${f.min}" max="${f.max}"><span class="unit">${f.unit}</span></div></div>`;
+    const rng = wrapEl.querySelector('input[type=range]'), num = wrapEl.querySelector('input[type=number]');
+    rng.value = v; num.value = v;
+    rng.addEventListener('input', () => { num.value = rng.value; onChange(f.key, +rng.value); });
+    num.addEventListener('input', () => { const n = parseFloat(num.value); if (!isNaN(n)) { const c = clamp(n, f.min, f.max); rng.value = c; onChange(f.key, c); } });
+    num.addEventListener('blur', () => { num.value = obj[f.key]; });
+  }
+  return wrapEl;
+}
+
+/* ================= 기타 ================= */
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ================= 시작 ================= */
+TemplateStore.init();
+updateAdminUI();
+// 다른 탭·창에 갔다가 돌아오면 템플릿 목록을 최신으로 다시 불러옴
+document.addEventListener('visibilitychange', () => { if (!document.hidden && state.view === 'make-pick' && TemplateStore.cloud()) go('make-pick'); });
+(async () => {
+  // 공유 URL(?banner=ID)로 들어오면 저장된 배너를 불러와 바로 보여 줌
+  const bannerId = new URLSearchParams(location.search).get('banner');
+  if (bannerId && await openSharedBanner(bannerId)) return;
+  go(MENU_ROOT[location.hash.slice(1)] || 'make-pick');
+})();
+</script>
+</body>
+</html>
